@@ -1,0 +1,18 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+logs/*.jsonl
+.DS_Store
+.env
+# Keep generated report artifacts in git for the portfolio; CSV can be large/regenerated.
+reports/results.csv
+web/node_modules/
+web/.next/
+web/out/
+.vercel/

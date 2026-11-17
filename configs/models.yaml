@@ -1,0 +1,11 @@
+# Models for Phase 1. Tags verified against the Ollama library.
+# Pull with: uv run python scripts/setup.py
+default_model: llama3.2:3b
+
+models:
+  - name: llama3.2:3b
+    note: Small and fast; good default for Mac laptops.
+  - name: phi4-mini
+    note: Compact Microsoft model; strong for its size.
+  - name: mistral:7b
+    note: Larger; slower but often higher quality.

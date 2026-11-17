@@ -1,0 +1,6 @@
+Senior Python Engineer at Acme Corp — San Francisco, CA (Hybrid).
+5+ years experience required.
+Must have: Python, FastAPI, PostgreSQL, AWS.
+Nice to have: Kubernetes, Terraform.
+Salary $150,000–$180,000 USD per year.
+Own APIs end to end and mentor juniors.

@@ -1,0 +1,7 @@
+{
+  "chip": "Apple M4",
+  "ram_gb": 16.0,
+  "machine": "arm64",
+  "macos": "27.2.1",
+  "python": "3.12.2"
+}

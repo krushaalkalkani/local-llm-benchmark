@@ -1,0 +1,14 @@
+[
+  {
+    "id": "jd_001",
+    "text": "Senior Python Engineer at Acme Corp — San Francisco, CA (Hybrid). 5+ years experience. Required: Python, FastAPI, PostgreSQL, AWS. Nice to have: Kubernetes, Terraform. Salary $150k–$180k USD/year. We are looking for someone who can own APIs end to end."
+  },
+  {
+    "id": "jd_002",
+    "text": "Job: ML Intern\nCompany: BrightLabs\nLocation: Remote (US)\nAbout: Join our NLP team for summer. Preferred coursework in ML. Skills: Python, PyTorch helpful. No salary listed."
+  },
+  {
+    "id": "jd_003",
+    "text": "WE'RE HIRING!!! Mid-level frontend @ Nova Retail HQ downtown Austin TX onsite. Need React + TypeScript. Bonus: GraphQL. 3 years preferred. Comp: 45-55/hr."
+  }
+]

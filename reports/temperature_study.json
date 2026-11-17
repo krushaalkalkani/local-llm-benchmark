@@ -1,0 +1,154 @@
+{
+  "model": "llama3.2:3b",
+  "runs_per_temp": 5,
+  "jobs": [
+    "jd_001",
+    "jd_002",
+    "jd_003"
+  ],
+  "by_temperature": {
+    "0.0": {
+      "mean_exact_match_rate": 1.0,
+      "mean_field_disagreement": 0.0,
+      "valid_first_try_rate": 1.0,
+      "per_job": [
+        {
+          "id": "jd_001",
+          "exact_match_rate": 1.0,
+          "field_disagreement": 0.0,
+          "sample": {
+            "title": "Senior Python Engineer",
+            "company": "Acme Corp",
+            "seniority": "senior",
+            "location": "San Francisco, CA",
+            "remote": "hybrid",
+            "required_skills": [
+              "aws",
+              "fastapi",
+              "postgresql",
+              "python"
+            ],
+            "nice_to_have_skills": [
+              "kubernetes",
+              "terraform"
+            ],
+            "years_experience": null,
+            "salary": {
+              "min_amount": 150000.0,
+              "max_amount": 180000.0,
+              "currency": "USD",
+              "period": null
+            }
+          }
+        },
+        {
+          "id": "jd_002",
+          "exact_match_rate": 1.0,
+          "field_disagreement": 0.0,
+          "sample": {
+            "title": "ML Intern",
+            "company": "BrightLabs",
+            "seniority": "intern",
+            "location": "Remote (US)",
+            "remote": "remote",
+            "required_skills": [],
+            "nice_to_have_skills": [],
+            "years_experience": null,
+            "salary": null
+          }
+        },
+        {
+          "id": "jd_003",
+          "exact_match_rate": 1.0,
+          "field_disagreement": 0.0,
+          "sample": {
+            "title": "Mid-level Frontend",
+            "company": "Nova Retail",
+            "seniority": "mid",
+            "location": "Austin, TX",
+            "remote": "onsite",
+            "required_skills": [
+              "react",
+              "typescript"
+            ],
+            "nice_to_have_skills": [
+              "graphql"
+            ],
+            "years_experience": 3.0,
+            "salary": null
+          }
+        }
+      ]
+    },
+    "0.7": {
+      "mean_exact_match_rate": 0.467,
+      "mean_field_disagreement": 0.407,
+      "valid_first_try_rate": 1.0,
+      "per_job": [
+        {
+          "id": "jd_001",
+          "exact_match_rate": 0.4,
+          "field_disagreement": 0.556,
+          "sample": {
+            "title": "Senior Python Engineer",
+            "company": "Acme Corp",
+            "seniority": "senior",
+            "location": "San Francisco, CA",
+            "remote": "hybrid",
+            "required_skills": [],
+            "nice_to_have_skills": [],
+            "years_experience": 5.0,
+            "salary": {
+              "min_amount": 150000.0,
+              "max_amount": 180000.0,
+              "currency": null,
+              "period": null
+            }
+          }
+        },
+        {
+          "id": "jd_002",
+          "exact_match_rate": 0.8,
+          "field_disagreement": 0.111,
+          "sample": {
+            "title": "ML Intern",
+            "company": "BrightLabs",
+            "seniority": "intern",
+            "location": "Remote (US)",
+            "remote": "remote",
+            "required_skills": [],
+            "nice_to_have_skills": [],
+            "years_experience": null,
+            "salary": null
+          }
+        },
+        {
+          "id": "jd_003",
+          "exact_match_rate": 0.2,
+          "field_disagreement": 0.556,
+          "sample": {
+            "title": "Mid-level Frontend",
+            "company": "Nova Retail",
+            "seniority": "mid",
+            "location": "downtown Austin TX onsite",
+            "remote": "unspecified",
+            "required_skills": [
+              "react",
+              "typescript"
+            ],
+            "nice_to_have_skills": [
+              "graphql"
+            ],
+            "years_experience": 3.0,
+            "salary": {
+              "min_amount": 45.0,
+              "max_amount": 55.0,
+              "currency": null,
+              "period": null
+            }
+          }
+        }
+      ]
+    }
+  }
+}
