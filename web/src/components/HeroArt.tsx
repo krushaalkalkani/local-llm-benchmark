@@ -1,82 +1,82 @@
 export default function HeroArt() {
   return (
-    <div
-      className="relative h-full min-h-[320px] w-full overflow-hidden border border-[var(--line)] bg-[var(--paper-2)]"
+    <svg
+      className="absolute inset-0 h-full w-full"
+      viewBox="0 0 900 700"
+      preserveAspectRatio="xMidYMid slice"
       aria-hidden
     >
-      <div className="grid-overlay absolute inset-0 opacity-70" />
-      <div className="scan-line" />
+      <defs>
+        <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#d2ff3f" stopOpacity="0" />
+          <stop offset="45%" stopColor="#d2ff3f" stopOpacity="0.85" />
+          <stop offset="100%" stopColor="#d2ff3f" stopOpacity="0" />
+        </linearGradient>
+        <filter id="soft">
+          <feGaussianBlur stdDeviation="0.6" />
+        </filter>
+      </defs>
 
-      <svg
-        viewBox="0 0 640 420"
-        className="absolute inset-0 h-full w-full"
-        role="presentation"
+      {/* Orbit rings */}
+      <g
+        fill="none"
+        stroke="#d2ff3f"
+        strokeOpacity="0.35"
+        style={{ animation: "drift 10s ease-in-out infinite" }}
       >
-        <defs>
-          <linearGradient id="track" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#1f5c3a" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="#c45c26" stopOpacity="0.35" />
-          </linearGradient>
-        </defs>
+        <ellipse cx="620" cy="300" rx="220" ry="140" strokeWidth="1.2" />
+        <ellipse cx="620" cy="300" rx="160" ry="95" strokeWidth="1" />
+        <ellipse cx="620" cy="300" rx="100" ry="55" strokeWidth="1.5" />
+      </g>
 
-        {/* Race lanes */}
-        {[90, 160, 230, 300].map((y) => (
-          <line
-            key={y}
-            x1="40"
-            y1={y}
-            x2="600"
-            y2={y}
-            stroke="#c9c2ae"
-            strokeWidth="1"
-            strokeDasharray="6 8"
-          />
-        ))}
+      {/* Signal path */}
+      <path
+        d="M40 520 C 180 480, 240 560, 360 500 S 520 420, 620 300 S 760 180, 860 120"
+        fill="none"
+        stroke="url(#beam)"
+        strokeWidth="3"
+        strokeDasharray="12 10"
+        style={{ animation: "dash 2.8s linear infinite" }}
+      />
 
-        {/* Model bars as a live race */}
-        <g>
-          <text x="48" y="78" className="mono" fill="#5c6356" fontSize="12">
-            llama3.2:3b · 33.4 tok/s
-          </text>
-          <rect x="48" y="88" width="420" height="18" fill="url(#track)" />
-          <rect x="48" y="88" width="420" height="18" fill="#1f5c3a" opacity="0.85" />
-        </g>
-        <g>
-          <text x="48" y="148" className="mono" fill="#5c6356" fontSize="12">
-            phi4-mini · 24.5 tok/s
-          </text>
-          <rect x="48" y="158" width="310" height="18" fill="#143d27" opacity="0.75" />
-        </g>
-        <g>
-          <text x="48" y="218" className="mono" fill="#5c6356" fontSize="12">
-            mistral:7b · 12.5 tok/s · highest accuracy
-          </text>
-          <rect x="48" y="228" width="210" height="18" fill="#c45c26" opacity="0.9" />
-        </g>
+      {/* Node cluster */}
+      {[
+        [620, 300],
+        [540, 250],
+        [700, 250],
+        [560, 360],
+        [690, 355],
+        [620, 210],
+      ].map(([x, y], i) => (
+        <circle
+          key={i}
+          cx={x}
+          cy={y}
+          r={i === 0 ? 8 : 4.5}
+          fill="#d2ff3f"
+          filter="url(#soft)"
+          opacity={i === 0 ? 1 : 0.7}
+        />
+      ))}
 
-        {/* Meter cluster */}
-        <g transform="translate(480, 280)">
-          {[28, 44, 36, 52, 40].map((h, i) => (
-            <rect
-              key={i}
-              className="meter-bar"
-              x={i * 18}
-              y={60 - h}
-              width="10"
-              height={h}
-              fill={i === 4 ? "#c45c26" : "#1f5c3a"}
-              opacity="0.9"
-            />
-          ))}
-          <text x="0" y="84" fill="#5c6356" fontSize="11" fontFamily="monospace">
-            LIVE METRICS
-          </text>
-        </g>
-
-        <text x="48" y="360" fill="#12160f" fontSize="13" fontFamily="monospace">
-          Apple M4 · 16 GB · offline after pull
+      {/* Telemetry readout */}
+      <g fontFamily="ui-monospace, monospace" fill="#d2ff3f">
+        <text x="48" y="72" fontSize="13" letterSpacing="2">
+          OFFLINE INFERENCE · ACTIVE
         </text>
-      </svg>
-    </div>
+        <text x="48" y="110" fontSize="42" fontWeight="700">
+          33.4
+        </text>
+        <text x="48" y="138" fontSize="12" opacity="0.75">
+          TOK/S PEAK · LLAMA3.2:3B
+        </text>
+        <text x="48" y="190" fontSize="42" fontWeight="700">
+          73.9%
+        </text>
+        <text x="48" y="218" fontSize="12" opacity="0.75">
+          FIELD ACCURACY · MISTRAL:7B
+        </text>
+      </g>
+    </svg>
   );
 }
