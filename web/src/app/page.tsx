@@ -1,38 +1,27 @@
-import Image from "next/image";
-import HeroArt from "../components/HeroArt";
+import Race from "../components/Race";
+import { MODELS, REPO, REPORT, type ModelResult } from "../lib/data";
 
-const REPO = "https://github.com/krushaalkalkani/local-llm-benchmark";
-const REPORT = `${REPO}/blob/main/reports/benchmark_report.md`;
-const SITE = "https://local-llm-benchmark-krushals-projects.vercel.app";
+type Metric = {
+  title: string;
+  hint: string;
+  value: (m: ModelResult) => number;
+  format: (v: number) => string;
+  lowerIsBetter?: boolean;
+};
 
-const results = [
-  {
-    model: "llama3.2:3b",
-    ram: "2.7 GB",
-    ttft: "2,392",
-    tok: "33.4",
-    valid: "100%",
-    acc: "68.0%",
-    note: "Best daily default",
-  },
-  {
-    model: "phi4-mini",
-    ram: "3.2 GB",
-    ttft: "3,757",
-    tok: "24.5",
-    valid: "100%",
-    acc: "61.0%",
-    note: "Middle weight",
-  },
-  {
-    model: "mistral:7b",
-    ram: "5.1 GB",
-    ttft: "11,091",
-    tok: "12.5",
-    valid: "100%",
-    acc: "73.9%",
-    note: "Highest accuracy",
-  },
+const METRICS: Metric[] = [
+  { title: "Field accuracy", hint: "Higher is better", value: (m) => m.accuracy, format: (v) => `${v.toFixed(1)}%` },
+  { title: "Tokens per second", hint: "Higher is better", value: (m) => m.tokPerSec, format: (v) => v.toFixed(1) },
+  { title: "Time to first token", hint: "Lower is better", value: (m) => m.ttftMs / 1000, format: (v) => `${v.toFixed(1)} s`, lowerIsBetter: true },
+  { title: "Peak memory", hint: "Lower is better", value: (m) => m.ramMb / 1024, format: (v) => `${v.toFixed(1)} GB`, lowerIsBetter: true },
+];
+
+const PIPELINE = [
+  ["Define the schema", "A Pydantic JobPosting model: title, company, seniority, location, remote policy, skills, experience and salary."],
+  ["Constrain the model", "The JSON Schema is passed to Ollama’s format option, so the model can only emit that shape."],
+  ["Validate", "The response is parsed and checked by Pydantic before anything downstream sees it."],
+  ["Retry once", "If validation fails, the model gets one more try with the exact error message in the prompt."],
+  ["Fail cleanly", "Still invalid? The caller gets a structured failure object instead of broken JSON."],
 ];
 
 function GitHubIcon() {
@@ -43,211 +32,164 @@ function GitHubIcon() {
   );
 }
 
+function MetricChart({ metric }: { metric: Metric }) {
+  const values = MODELS.map(metric.value);
+  const max = Math.max(...values);
+  const best = metric.lowerIsBetter ? Math.min(...values) : max;
+  return (
+    <figure className="metric">
+      <figcaption>
+        <span className="metric-title">{metric.title}</span>
+        <span className="metric-hint">{metric.hint}</span>
+      </figcaption>
+      <ul>
+        {MODELS.map((m) => {
+          const v = metric.value(m);
+          return (
+            <li key={m.id} className={`bar-row model-${m.id}`}>
+              <span className="bar-label">{m.name}</span>
+              <span className="bar-track">
+                <span className="bar" style={{ width: `${(v / max) * 100}%` }} />
+              </span>
+              <span className="bar-value tabular" data-best={v === best || undefined}>
+                {metric.format(v)}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </figure>
+  );
+}
+
 export default function Home() {
   return (
-    <main>
-      {/* Top bar with actions */}
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-5 sm:px-8">
-        <div className="flex items-center gap-3">
-          <span className="live-dot" aria-hidden />
-          <p className="mono text-[11px] tracking-[0.2em] text-[var(--mute)]">
-            KRUSHAL KALKANI · LOCAL BENCH
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          <a className="btn btn-ink" href={REPO} target="_blank" rel="noreferrer">
-            <GitHubIcon />
-            GitHub
+    <>
+      <header className="wrap topbar">
+        <a href="#top" className="wordmark">Krushal Kalkani</a>
+        <nav className="topnav">
+          <a href="#results">Results</a>
+          <a href="#how">How it works</a>
+          <a href={REPO} target="_blank" rel="noreferrer" className="btn btn-dark">
+            <GitHubIcon /> View on GitHub
           </a>
-          <a className="btn btn-outline" href={REPORT} target="_blank" rel="noreferrer">
-            Full report
-          </a>
-        </div>
-      </div>
+        </nav>
+      </header>
 
-      {/* HERO — one full-bleed stage */}
-      <section className="mx-auto max-w-6xl px-5 sm:px-8">
-        <div className="hero-stage">
-          <HeroArt />
-          <div className="relative z-10 flex h-full min-h-[min(88vh,820px)] flex-col justify-end p-6 sm:p-10 lg:max-w-[58%] lg:justify-center lg:p-14">
-            <p className="rise mono text-[11px] tracking-[0.24em] text-[var(--lime)]">
-              OFFLINE · APPLE M4 · 16 GB
+      <main id="top">
+        <section className="wrap hero">
+          <h1>Which local LLM should read job posts on a 16&nbsp;GB MacBook?</h1>
+          <p className="lede">
+            I ran llama3.2:3b, phi4-mini and mistral:7b fully offline on an Apple M4 and scored each one on turning
+            35 hand-labeled job posts into validated JSON. Here is the same extraction, replayed at each
+            model&rsquo;s measured speed.
+          </p>
+          <Race />
+        </section>
+
+        <section id="results" className="wrap section">
+          <div className="section-head">
+            <h2>Results</h2>
+            <p>
+              35 posts, temperature 0, same prompt for every model. All three returned valid JSON on the first
+              try every time, so the differences are in accuracy, speed and memory.
             </p>
-            <h1 className="rise-2 mt-4 text-[clamp(3.4rem,10vw,6.4rem)] font-bold leading-[0.9] tracking-[-0.05em]">
-              LOCAL
-              <br />
-              BENCH
-            </h1>
-            <p className="rise-3 mt-5 max-w-md text-lg leading-snug text-[#d7d3c8] sm:text-xl">
-              Measured offline. Picked with data — not vibes.
-            </p>
-            <p className="rise-3 mt-3 max-w-md text-sm leading-relaxed text-[#9aa39a]">
-              Private Ollama assistant: messy job posts → validated JSON, then a
-              rigorous 3-model bake-off on one Mac.
-            </p>
-            <div className="rise-3 mt-8 flex flex-wrap gap-3">
-              <a className="btn btn-lime" href="#results">
-                See the numbers
-              </a>
-              <a className="btn btn-ghost" href={REPO} target="_blank" rel="noreferrer">
-                <GitHubIcon />
-                Star on GitHub
-              </a>
-              <a className="btn btn-ghost" href={REPORT} target="_blank" rel="noreferrer">
-                Read report
-              </a>
+          </div>
+          <div className="metrics">
+            {METRICS.map((metric) => (
+              <MetricChart key={metric.title} metric={metric} />
+            ))}
+          </div>
+
+          <div className="verdict">
+            <div className="pick model-mistral">
+              <p className="pick-when">When accuracy matters</p>
+              <p className="pick-model">mistral:7b</p>
+              <p>Highest field accuracy at 73.9%, but it waits 11 seconds before the first token and needs 5 GB.</p>
+            </div>
+            <div className="pick model-llama">
+              <p className="pick-when">For everyday use</p>
+              <p className="pick-model">llama3.2:3b</p>
+              <p>About 2.7× the tokens per second on half the memory, for roughly 6 points less accuracy.</p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <div className="mx-auto max-w-6xl px-5 pb-24 sm:px-8">
-        {/* SYSTEM */}
-        <section className="section">
-          <p className="section-kicker">01 · What you get</p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
-            A private assistant that refuses broken JSON.
-          </h2>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[var(--mute)]">
-            Schema-constrained Ollama output. Pydantic validation. One retry with
-            the error message. Clean failure object if it still fails. Wi-Fi can
-            be off after models are pulled.
-          </p>
-          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+        <section className="wrap section">
+          <div className="section-head">
+            <h2>Why temperature 0</h2>
+            <p>
+              I ran llama3.2:3b five times on each of three posts and checked whether the JSON came back
+              identical.
+            </p>
+          </div>
+          <div className="temps">
             {[
-              ["Chat + API", "CLI streaming and FastAPI /chat with TTFT + tok/s"],
-              ["Extract", "JobPosting schema · format=JSON · single retry"],
-              ["Bench", "35 labeled prompts · 3 models · charts + recommendation"],
-            ].map(([title, body]) => (
-              <div key={title} className="stat-block">
-                <p className="text-xl font-semibold">{title}</p>
-                <p className="mt-2 text-[var(--mute)]">{body}</p>
+              { t: "0.0", match: 1.0, dis: 0.0 },
+              { t: "0.7", match: 0.467, dis: 0.407 },
+            ].map((row) => (
+              <div key={row.t} className="temp">
+                <p className="temp-t">Temperature {row.t}</p>
+                <p className="temp-num tabular">{Math.round(row.match * 100)}%</p>
+                <p className="temp-desc">of repeat runs returned identical JSON</p>
+                <span className="temp-track">
+                  <span style={{ width: `${row.match * 100}%` }} />
+                </span>
+                <p className="temp-sub tabular">{Math.round(row.dis * 100)}% of fields disagreed between runs</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* RESULTS */}
-        <section id="results" className="section">
-          <p className="section-kicker">02 · The bake-off</p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
-            35 prompts. Three models. One machine.
-          </h2>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[var(--mute)]">
-            Temperature 0.0. Every model hit 100% first-try JSON validity. Accuracy
-            is where they split.
-          </p>
-
-          <div className="table-wrap mt-10">
-            <table>
-              <thead>
-                <tr>
-                  <th>Model</th>
-                  <th>Peak RAM</th>
-                  <th>TTFT</th>
-                  <th>Tok/s</th>
-                  <th>JSON</th>
-                  <th>Field acc.</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {results.map((row) => (
-                  <tr key={row.model}>
-                    <td className="font-semibold">{row.model}</td>
-                    <td className="mono">{row.ram}</td>
-                    <td className="mono">{row.ttft} ms</td>
-                    <td className="mono">{row.tok}</td>
-                    <td className="mono">{row.valid}</td>
-                    <td className="mono font-semibold text-[var(--ok)]">{row.acc}</td>
-                    <td className="mono text-xs text-[var(--mute)]">{row.note}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <section id="how" className="wrap section">
+          <div className="section-head">
+            <h2>How the extraction stays valid</h2>
+            <p>Everything runs through Ollama on the laptop. Once the models are pulled, Wi-Fi can be off.</p>
           </div>
-
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {[
-              ["/charts/chart_speed.png", "Speed"],
-              ["/charts/chart_quality.png", "Quality"],
-              ["/charts/chart_memory.png", "Memory"],
-            ].map(([src, label]) => (
-              <figure key={src} className="border border-[var(--ink)] bg-white/50 p-3">
-                <Image
-                  src={src}
-                  alt={`${label} chart`}
-                  width={800}
-                  height={450}
-                  className="h-auto w-full"
-                />
-                <figcaption className="mono mt-3 text-xs tracking-wide text-[var(--mute)]">
-                  {label}
-                </figcaption>
-              </figure>
+          <ol className="pipeline">
+            {PIPELINE.map(([title, body]) => (
+              <li key={title}>
+                <p className="step-title">{title}</p>
+                <p>{body}</p>
+              </li>
             ))}
-          </div>
+          </ol>
         </section>
 
-        {/* TEMP */}
-        <section className="section">
-          <p className="section-kicker">03 · Temperature study</p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
-            Same prompt. Different chaos.
-          </h2>
-          <div className="mt-10 grid gap-8 sm:grid-cols-2">
-            <div className="border border-[var(--ink)] bg-[var(--steel)] p-6 text-[#f4f2ec]">
-              <p className="mono text-xs tracking-[0.18em] text-[var(--lime)]">TEMP 0.0</p>
-              <p className="mt-4 text-5xl font-bold tracking-tight">1.000</p>
-              <p className="mt-2 text-[#b7b3a8]">exact match across runs</p>
-              <p className="mono mt-4 text-sm text-[#9aa39a]">field disagreement 0.000</p>
-            </div>
-            <div className="border border-[var(--ink)] bg-[var(--bg-2)] p-6">
-              <p className="mono text-xs tracking-[0.18em] text-[var(--mute)]">TEMP 0.7</p>
-              <p className="mt-4 text-5xl font-bold tracking-tight">0.467</p>
-              <p className="mt-2 text-[var(--mute)]">exact match across runs</p>
-              <p className="mono mt-4 text-sm text-[var(--mute)]">field disagreement 0.407</p>
+        <section className="wrap section run">
+          <div>
+            <h2>Run it yourself</h2>
+            <p>
+              Needs Ollama and uv. The setup script pulls all three models; after that the benchmark writes a CSV,
+              charts and a Markdown report to <code>reports/</code>.
+            </p>
+            <div className="run-links">
+              <a href={REPO} target="_blank" rel="noreferrer" className="btn btn-dark">
+                <GitHubIcon /> View on GitHub
+              </a>
+              <a href={REPORT} target="_blank" rel="noreferrer" className="btn btn-line">
+                Read the full report
+              </a>
             </div>
           </div>
+          <pre className="terminal">
+            <code>
+              <span className="prompt">$</span> uv sync{"\n"}
+              <span className="prompt">$</span> uv run python scripts/setup.py{"\n"}
+              <span className="prompt">$</span> make bench{"\n"}
+              <span className="comment"># try the assistant</span>{"\n"}
+              <span className="prompt">$</span> uv run assistant extract --file samples/sample_job.txt
+            </code>
+          </pre>
         </section>
+      </main>
 
-        {/* DECISION + CTA */}
-        <section className="section">
-          <p className="section-kicker">04 · Call</p>
-          <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-5xl">
-            Accuracy wants mistral. Speed wants llama.
-          </h2>
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-[var(--mute)]">
-            On this M4 / 16GB machine: pick <strong className="text-[var(--ink)]">mistral:7b</strong> when
-            field quality matters, or <strong className="text-[var(--ink)]">llama3.2:3b</strong> when you
-            want ~2.7× tokens/sec and half the RAM.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-3">
-            <a className="btn btn-lime" href={REPO} target="_blank" rel="noreferrer">
-              <GitHubIcon />
-              Open GitHub repo
-            </a>
-            <a className="btn btn-ink" href={REPORT} target="_blank" rel="noreferrer">
-              Open benchmark report
-            </a>
-            <a className="btn btn-outline" href="#results">
-              Back to numbers
-            </a>
-          </div>
-          <p className="mono mt-8 text-sm text-[var(--mute)]">
-            Reproduce locally → <span className="text-[var(--ink)]">make bench</span>
-          </p>
-        </section>
-
-        <footer className="mt-24 border-t border-[var(--line)] pt-8 text-sm text-[var(--mute)]">
-          <p className="mono text-[11px] tracking-[0.16em]">
-            ONE PROJECT · ONE SITE · {SITE.replace("https://", "")}
-          </p>
-          <p className="mt-3 max-w-xl">
-            Apple M4 · 16 GB · macOS 27.2.1 · Fully offline after model pull.
-          </p>
-        </footer>
-      </div>
-    </main>
+      <footer className="wrap footer">
+        <p>Measured on an Apple M4 MacBook with 16 GB of unified memory, macOS 27.2.1.</p>
+        <p>
+          Built by Krushal Kalkani. <a href={REPO} target="_blank" rel="noreferrer">Source on GitHub</a>
+        </p>
+      </footer>
+    </>
   );
 }

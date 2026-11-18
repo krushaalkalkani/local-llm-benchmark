@@ -1,33 +1,29 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { Familjen_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-const display = Space_Grotesk({
-  variable: "--font-display",
+const sans = Familjen_Grotesk({
+  variable: "--font-sans-face",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
 
-const mono = JetBrains_Mono({
-  variable: "--font-mono",
+const mono = IBM_Plex_Mono({
+  variable: "--font-mono-face",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
-  title: "LOCAL BENCH — Offline LLM measured on Apple Silicon",
+  title: "Local LLM Benchmark — Krushal Kalkani",
   description:
-    "Private Ollama assistant with schema-validated job extraction and a 3-model benchmark on Apple M4.",
+    "Three local LLMs, run fully offline on an Apple M4 with 16 GB, scored on turning 35 job posts into validated JSON.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${display.variable} ${mono.variable} h-full`}>
-      <body className="min-h-full antialiased">{children}</body>
+    <html lang="en" className={`${sans.variable} ${mono.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }
