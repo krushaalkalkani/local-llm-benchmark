@@ -67,7 +67,6 @@ export default function Home() {
     <>
       <div className="hero-band" id="top">
       <header className="wrap topbar">
-        <a href="#top" className="wordmark">Krushal Kalkani</a>
         <nav className="topnav">
           <a href="#results">Results</a>
           <a href="#how">How it works</a>
@@ -189,7 +188,7 @@ export default function Home() {
       <footer className="wrap footer">
         <p>Measured on an Apple M4 MacBook with 16 GB of unified memory, macOS 27.2.1.</p>
         <p>
-          Built by Krushal Kalkani. <a href={REPO} target="_blank" rel="noreferrer">Source on GitHub</a>
+          <a href={REPO} target="_blank" rel="noreferrer">Source on GitHub</a>
         </p>
       </footer>
     </>
