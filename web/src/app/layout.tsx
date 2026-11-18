@@ -15,7 +15,7 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Local LLM Benchmark — Krushal Kalkani",
+  title: "Local LLM Benchmark",
   description:
     "Three local LLMs, run fully offline on an Apple M4 with 16 GB, scored on turning 35 job posts into validated JSON.",
 };
