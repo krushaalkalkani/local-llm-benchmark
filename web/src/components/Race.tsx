@@ -12,6 +12,7 @@ function finishMs(ttftMs: number, tokPerSec: number) {
 }
 
 const LONGEST = Math.max(...MODELS.map((m) => finishMs(m.ttftMs, m.tokPerSec)));
+const AXIS_MS = Math.ceil(LONGEST / 5000) * 5000;
 
 export default function Race() {
   const [speed, setSpeed] = useState<1 | 3>(3);
@@ -40,6 +41,46 @@ export default function Race() {
       <div className="race-input">
         <p className="race-label">Input: job post jd_001</p>
         <p className="race-post">{SAMPLE_POST}</p>
+      </div>
+
+      <div className="timeline" aria-label="Timeline of each model's extraction">
+        {MODELS.map((m) => {
+          const end = finishMs(m.ttftMs, m.tokPerSec);
+          const waitPct = (m.ttftMs / AXIS_MS) * 100;
+          const genPct = ((end - m.ttftMs) / AXIS_MS) * 100;
+          const nowWait = Math.min(elapsed, m.ttftMs);
+          const nowGen = Math.max(0, Math.min(elapsed, end) - m.ttftMs);
+          const done = elapsed >= end;
+          return (
+            <div key={m.id} className={`tl-row model-${m.id}`}>
+              <span className="tl-name">{m.name}</span>
+              <span className="tl-track">
+                <span className="tl-wait" style={{ width: `${waitPct}%` }}>
+                  <span style={{ width: `${(nowWait / m.ttftMs) * 100}%` }} />
+                </span>
+                <span className="tl-gen" style={{ left: `${waitPct}%`, width: `${genPct}%` }}>
+                  <span style={{ width: `${(nowGen / (end - m.ttftMs)) * 100}%` }} />
+                </span>
+              </span>
+              <span className="tl-end tabular" data-done={done || undefined}>
+                {done ? `${(end / 1000).toFixed(1)} s` : "…"}
+              </span>
+            </div>
+          );
+        })}
+        <div className="tl-axis" aria-hidden>
+          <span />
+          <span className="tl-ticks">
+            {Array.from({ length: AXIS_MS / 5000 + 1 }, (_, i) => (
+              <span key={i} style={{ left: `${(i * 5000 * 100) / AXIS_MS}%` }}>{i * 5} s</span>
+            ))}
+          </span>
+          <span />
+        </div>
+        <div className="tl-legend">
+          <span><i className="tl-key-wait" /> Waiting for first token</span>
+          <span><i className="tl-key-gen" /> Generating JSON</span>
+        </div>
       </div>
 
       <div className="race-lanes">

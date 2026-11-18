@@ -134,9 +134,55 @@ code {
   background: var(--surface);
 }
 
+/* Hero band */
+.hero-band {
+  position: relative;
+  isolation: isolate;
+  color: #fff;
+  background:
+    linear-gradient(to bottom, transparent calc(100% - 140px), var(--bg) calc(100% - 140px)),
+    radial-gradient(60% 70% at 85% 10%, rgba(31, 94, 255, 0.28), transparent 70%),
+    radial-gradient(50% 60% at 10% 90%, rgba(138, 63, 252, 0.22), transparent 70%),
+    #111726;
+}
+
+.hero-band::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 140px;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: linear-gradient(to bottom, black 30%, transparent 100%);
+  pointer-events: none;
+}
+
+.hero-band .topnav > a:not(.btn) {
+  color: #aab3c5;
+}
+
+.hero-band .topnav > a:not(.btn):hover {
+  color: #fff;
+}
+
+.btn-light {
+  background: #fff;
+  color: var(--ink);
+}
+
+.btn-light:hover {
+  background: #dfe5f0;
+}
+
 /* Hero */
 .hero {
-  padding-top: 48px;
+  padding-top: 56px;
+}
+
+.hero .lede {
+  color: #b7c0d1;
 }
 
 .hero h1 {
@@ -156,11 +202,147 @@ code {
 
 /* Race */
 .race {
-  margin-top: 40px;
+  margin-top: 44px;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 16px;
   background: var(--surface);
+  color: var(--ink);
   overflow: hidden;
+  box-shadow: 0 30px 60px -30px rgba(10, 16, 32, 0.55);
+}
+
+/* Timeline */
+.timeline {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tl-row,
+.tl-axis {
+  display: grid;
+  grid-template-columns: 96px 1fr 56px;
+  align-items: center;
+  gap: 12px;
+}
+
+.tl-row {
+  height: 30px;
+}
+
+.tl-name {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.tl-track {
+  position: relative;
+  height: 12px;
+}
+
+.tl-wait,
+.tl-gen {
+  position: absolute;
+  top: 0;
+  height: 100%;
+}
+
+.tl-wait {
+  left: 0;
+  background: repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 10px);
+}
+
+.tl-wait > span {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, #8d97a8 0 6px, transparent 6px 10px);
+}
+
+.tl-gen {
+  background: color-mix(in srgb, var(--c) 16%, transparent);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.tl-gen > span {
+  display: block;
+  height: 100%;
+  background: var(--c);
+}
+
+.tl-end {
+  text-align: right;
+  font-size: 0.88rem;
+  color: var(--mute);
+}
+
+.tl-end[data-done] {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.tl-axis {
+  height: 22px;
+  margin-top: 4px;
+}
+
+.tl-ticks {
+  position: relative;
+  height: 100%;
+  border-top: 1px solid var(--line);
+}
+
+.tl-ticks span {
+  position: absolute;
+  top: 4px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.75rem;
+  color: var(--mute);
+}
+
+.tl-ticks span:first-child {
+  transform: none;
+}
+
+.tl-ticks span:last-child {
+  transform: translateX(-100%);
+}
+
+.tl-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: var(--mute);
+}
+
+.tl-legend i {
+  display: inline-block;
+  width: 18px;
+  height: 8px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.tl-key-wait {
+  background: repeating-linear-gradient(90deg, #8d97a8 0 4px, transparent 4px 7px);
+}
+
+.tl-key-gen {
+  background: var(--ink);
+  border-radius: 2px;
+}
+
+@media (max-width: 520px) {
+  .tl-row,
+  .tl-axis {
+    grid-template-columns: 78px 1fr 44px;
+    gap: 8px;
+  }
+  .tl-name {
+    font-size: 0.72rem;
+  }
 }
 
 .race-input {

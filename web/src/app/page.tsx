@@ -65,18 +65,18 @@ function MetricChart({ metric }: { metric: Metric }) {
 export default function Home() {
   return (
     <>
+      <div className="hero-band" id="top">
       <header className="wrap topbar">
         <a href="#top" className="wordmark">Krushal Kalkani</a>
         <nav className="topnav">
           <a href="#results">Results</a>
           <a href="#how">How it works</a>
-          <a href={REPO} target="_blank" rel="noreferrer" className="btn btn-dark">
+          <a href={REPO} target="_blank" rel="noreferrer" className="btn btn-light">
             <GitHubIcon /> View on GitHub
           </a>
         </nav>
       </header>
 
-      <main id="top">
         <section className="wrap hero">
           <h1>Which local LLM should read job posts on a 16&nbsp;GB MacBook?</h1>
           <p className="lede">
@@ -86,7 +86,9 @@ export default function Home() {
           </p>
           <Race />
         </section>
+      </div>
 
+      <main>
         <section id="results" className="wrap section">
           <div className="section-head">
             <h2>Results</h2>
